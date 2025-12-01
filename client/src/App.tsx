@@ -11,6 +11,7 @@ import Home from "@/pages/home";
 import ScriptPage from "@/pages/script-page";
 import Practices from "@/pages/practices";
 import SessionComplete from "@/pages/session-complete";
+import SessionFlow from "@/pages/session-flow";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/script/:id" component={ScriptPage} />
       <Route path="/practices" component={Practices} />
       <Route path="/session-complete" component={SessionComplete} />
+      <Route path="/session-flow" component={SessionFlow} />
       <Route component={NotFound} />
     </Switch>
   );

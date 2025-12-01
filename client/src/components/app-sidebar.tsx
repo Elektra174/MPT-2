@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
-import { ChevronDown, ChevronRight, BookOpen, Sparkles, CheckSquare } from "lucide-react";
+import { ChevronDown, ChevronRight, BookOpen, Sparkles, CheckSquare, Play } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
   Sidebar,
@@ -157,6 +157,18 @@ export function AppSidebar() {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location === "/session-flow"}
+                    className="hover-elevate"
+                  >
+                    <Link href="/session-flow" data-testid="link-session-flow">
+                      <Play className="h-4 w-4" />
+                      <span>Управляемый сеанс</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
