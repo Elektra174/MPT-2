@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { ArrowLeft, ChevronRight, Play, AlertCircle } from "lucide-react";
+import { ArrowLeft, ChevronRight, Play, AlertCircle, Bell } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
+import { SessionRoadmap } from "@/components/session-roadmap";
+import { QuestionTemplates } from "@/components/question-templates";
+import { SessionChecklist } from "@/components/session-checklist";
+import { StageRecommendations } from "@/components/stage-recommendations";
 import type { Category, TherapyScript } from "@shared/schema";
 
-type SessionStage = "intake" | "analysis" | "selection" | "execution";
+type SessionStage = "intake" | "analysis" | "selection" | "execution" | "completion";
 
 interface SessionState {
   stage: SessionStage;
@@ -17,6 +22,10 @@ interface SessionState {
   analysis: string;
   selectedScriptId: string | null;
   currentBlockIndex: number;
+}
+
+interface ChecklistState {
+  [key: string]: string[];
 }
 
 const INTAKE_QUESTIONS = [
@@ -34,6 +43,7 @@ const ANALYSIS_QUESTIONS = [
 ];
 
 export default function SessionFlow() {
+  const { toast } = useToast();
   const [sessionState, setSessionState] = useState<SessionState>({
     stage: "intake",
     clientProblem: "",
@@ -44,6 +54,13 @@ export default function SessionFlow() {
 
   const [intakeAnswers, setIntakeAnswers] = useState<string[]>(["", "", "", ""]);
   const [analysisAnswers, setAnalysisAnswers] = useState<string[]>(["", "", "", ""]);
+  const [checklist, setChecklist] = useState<ChecklistState>({
+    intake: [],
+    analysis: [],
+    selection: [],
+    execution: [],
+    completion: [],
+  });
 
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
@@ -54,6 +71,14 @@ export default function SessionFlow() {
   });
 
   const selectedScript = scripts.find((s) => s.id === sessionState.selectedScriptId);
+
+  const showStageNotification = (stageName: string) => {
+    toast({
+      title: stageName,
+      description: "Вы перешли на новый этап сеанса",
+      duration: 3000,
+    });
+  };
 
   const getRecommendedScripts = () => {
     const problem = sessionState.clientProblem.toLowerCase();
@@ -89,6 +114,7 @@ export default function SessionFlow() {
       stage: "analysis",
       clientProblem: problem,
     }));
+    showStageNotification("Анализ запроса");
   };
 
   const handleAnalysisNext = () => {
@@ -98,6 +124,7 @@ export default function SessionFlow() {
       stage: "selection",
       analysis: analysis,
     }));
+    showStageNotification("Выбор скрипта");
   };
 
   const handleSelectScript = (scriptId: string) => {
@@ -107,6 +134,7 @@ export default function SessionFlow() {
       stage: "execution",
       currentBlockIndex: 0,
     }));
+    showStageNotification("Выполнение скрипта");
   };
 
   const handlePreviousBlock = () => {
@@ -126,6 +154,14 @@ export default function SessionFlow() {
   };
 
   const handleFinishSession = () => {
+    setSessionState((prev) => ({
+      ...prev,
+      stage: "completion",
+    }));
+    showStageNotification("Завершение сеанса");
+  };
+
+  const handleCompleteSession = () => {
     setSessionState({
       stage: "intake",
       clientProblem: "",
@@ -137,10 +173,21 @@ export default function SessionFlow() {
     setAnalysisAnswers(["", "", "", ""]);
   };
 
+  const toggleChecklistItem = (itemId: string) => {
+    setChecklist((prev) => ({
+      ...prev,
+      [sessionState.stage]: prev[sessionState.stage].includes(itemId)
+        ? prev[sessionState.stage].filter((i) => i !== itemId)
+        : [...prev[sessionState.stage], itemId],
+    }));
+  };
+
   // ===== ЭТАП 1: НАЧАЛО СЕАНСА =====
   if (sessionState.stage === "intake") {
     return (
       <div className="p-6 max-w-3xl mx-auto">
+        <SessionRoadmap currentStage="intake" />
+        
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
           <Link href="/" className="hover:text-foreground">
             Главная
@@ -152,7 +199,9 @@ export default function SessionFlow() {
         <h1 className="text-3xl font-bold mb-2">Начало сеанса</h1>
         <p className="text-muted-foreground mb-8">Ответьте на вопросы для понимания вашего запроса</p>
 
-        <div className="space-y-6">
+        <StageRecommendations stage="intake" />
+
+        <div className="space-y-6 my-6">
           {INTAKE_QUESTIONS.map((question, i) => (
             <Card key={i}>
               <CardHeader>
@@ -175,7 +224,9 @@ export default function SessionFlow() {
           ))}
         </div>
 
-        <div className="flex gap-4 mt-8">
+        <SessionChecklist stage="intake" checkedItems={checklist.intake} onToggle={toggleChecklistItem} />
+
+        <div className="flex gap-4 mt-8 flex-wrap">
           <Link href="/">
             <Button variant="ghost">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -199,9 +250,11 @@ export default function SessionFlow() {
   if (sessionState.stage === "analysis") {
     return (
       <div className="p-6 max-w-3xl mx-auto">
+        <SessionRoadmap currentStage="analysis" />
+
         <div className="mb-8">
           <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-            Этап 2 из 4
+            Этап 2 из 5
           </div>
           <h1 className="text-3xl font-bold mb-2">Уточнение запроса</h1>
           <p className="text-muted-foreground">Определим оптимальный подход к вашей ситуации</p>
@@ -214,7 +267,9 @@ export default function SessionFlow() {
           </AlertDescription>
         </Alert>
 
-        <div className="space-y-6">
+        <StageRecommendations stage="analysis" />
+
+        <div className="space-y-6 my-6">
           {ANALYSIS_QUESTIONS.map((question, i) => (
             <Card key={i}>
               <CardHeader>
@@ -237,7 +292,9 @@ export default function SessionFlow() {
           ))}
         </div>
 
-        <div className="flex gap-4 mt-8">
+        <SessionChecklist stage="analysis" checkedItems={checklist.analysis} onToggle={toggleChecklistItem} />
+
+        <div className="flex gap-4 mt-8 flex-wrap">
           <Button 
             variant="ghost"
             onClick={() => setSessionState((prev) => ({ ...prev, stage: "intake" }))}
@@ -253,6 +310,7 @@ export default function SessionFlow() {
             Далее: Выбор скрипта
             <ChevronRight className="h-4 w-4 ml-2" />
           </Button>
+          <QuestionTemplates stage="analysis" />
         </div>
       </div>
     );
@@ -264,16 +322,20 @@ export default function SessionFlow() {
 
     return (
       <div className="p-6 max-w-3xl mx-auto">
+        <SessionRoadmap currentStage="selection" />
+
         <div className="mb-8">
           <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-            Этап 3 из 4
+            Этап 3 из 5
           </div>
           <h1 className="text-3xl font-bold mb-2">Выбор подходящего скрипта</h1>
           <p className="text-muted-foreground">На основе вашего запроса рекомендуем следующие скрипты</p>
         </div>
 
+        <StageRecommendations stage="selection" />
+
         {recommendedScripts.length > 0 ? (
-          <div className="space-y-4 mb-8">
+          <div className="space-y-4 mb-8 mt-6">
             {recommendedScripts.map((script) => (
               <Card 
                 key={script.id}
@@ -326,7 +388,7 @@ export default function SessionFlow() {
           </div>
         </div>
 
-        <div className="flex gap-4 mt-8">
+        <div className="flex gap-4 mt-8 flex-wrap">
           <Button 
             variant="ghost"
             onClick={() => setSessionState((prev) => ({ ...prev, stage: "analysis" }))}
@@ -346,10 +408,12 @@ export default function SessionFlow() {
 
     return (
       <div className="p-6 max-w-3xl mx-auto">
+        <SessionRoadmap currentStage="execution" />
+
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
             <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
-              Этап 4 из 4
+              Этап 4 из 5
             </div>
             <div className="text-sm text-muted-foreground">
               {sessionState.currentBlockIndex + 1} из {selectedScript.blocks.length}
@@ -384,7 +448,7 @@ export default function SessionFlow() {
           </CardHeader>
         </Card>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           <Button 
             variant="outline"
             onClick={handlePreviousBlock}
@@ -421,6 +485,40 @@ export default function SessionFlow() {
           >
             Изменить скрипт
           </Button>
+          <QuestionTemplates stage="execution" />
+        </div>
+      </div>
+    );
+  }
+
+  // ===== ЭТАП 5: ЗАВЕРШЕНИЕ =====
+  if (sessionState.stage === "completion") {
+    return (
+      <div className="p-6 max-w-3xl mx-auto">
+        <SessionRoadmap currentStage="completion" />
+
+        <h1 className="text-3xl font-bold mb-2">Завершение сеанса</h1>
+        <p className="text-muted-foreground mb-8">Протокол завершения терапевтической сеанса</p>
+
+        <StageRecommendations stage="completion" />
+
+        <SessionChecklist stage="completion" checkedItems={checklist.completion} onToggle={toggleChecklistItem} />
+
+        <div className="flex gap-4 mt-8 flex-wrap">
+          <Button 
+            onClick={handleCompleteSession}
+            className="bg-success hover:bg-success/90"
+            data-testid="button-new-session"
+          >
+            Начать новый сеанс
+            <ChevronRight className="h-4 w-4 ml-2" />
+          </Button>
+          <Link href="/">
+            <Button variant="ghost">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              На главную
+            </Button>
+          </Link>
         </div>
       </div>
     );

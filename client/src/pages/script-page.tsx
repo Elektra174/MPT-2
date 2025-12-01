@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
+import { ScriptTips } from "@/components/script-tips";
 import type { TherapyScript, Category, ScriptBlock } from "@shared/schema";
 
 const HISTORY_KEY = "mpt-script-history";
@@ -258,7 +259,7 @@ export default function ScriptPage() {
                 </p>
               )}
             </div>
-            <div className="flex gap-2 flex-shrink-0">
+            <div className="flex gap-2 flex-shrink-0 flex-wrap">
               <Button variant="outline" size="sm" onClick={handlePrint} data-testid="button-print">
                 <Printer className="h-4 w-4 mr-2" />
                 Печать
