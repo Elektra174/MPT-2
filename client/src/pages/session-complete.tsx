@@ -191,38 +191,6 @@ export default function SessionComplete() {
         </p>
       </div>
 
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-4">
-              <div 
-                className="relative w-16 h-16 rounded-full border-4 border-muted flex items-center justify-center"
-                style={{
-                  background: `conic-gradient(hsl(var(--primary)) ${progress * 3.6}deg, hsl(var(--muted)) 0deg)`
-                }}
-              >
-                <div className="absolute inset-1 bg-card rounded-full flex items-center justify-center">
-                  <span className="text-sm font-semibold" data-testid="text-progress">{progress}%</span>
-                </div>
-              </div>
-              <div>
-                <p className="font-medium text-foreground">
-                  {allCompleted ? "Сессия завершена" : "Прогресс завершения"}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {completedSteps.length} из {allItems.length} пунктов выполнено
-                </p>
-              </div>
-            </div>
-            {completedSteps.length > 0 && (
-              <Button variant="outline" size="sm" onClick={resetProgress} data-testid="button-reset">
-                Сбросить
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
       <div className="space-y-6">
         {SESSION_SECTIONS.map((section) => (
           <div key={section.id}>
