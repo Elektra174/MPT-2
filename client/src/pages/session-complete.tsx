@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { ArrowLeft, ChevronRight, Check, Circle } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { ArrowLeft, ChevronRight, Check, CircleHelp, CheckCircle2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
-import type { SessionCompletionStep } from "@shared/schema";
 
 const COMPLETED_STEPS_KEY = "mpt-completed-steps";
 
@@ -25,12 +24,132 @@ function saveCompletedSteps(steps: string[]) {
   }
 }
 
+interface SessionSection {
+  id: string;
+  title: string;
+  icon: string;
+  items: Array<{
+    id: string;
+    content: string;
+    isAction: boolean;
+  }>;
+}
+
+const SESSION_SECTIONS: SessionSection[] = [
+  {
+    id: "summary",
+    title: "ПОДВЕДЕНИЕ ИТОГОВ",
+    icon: "📋",
+    items: [
+      {
+        id: "sum-1",
+        content: "Какие ключевые инсайты ты вынес из сегодняшней сессии?",
+        isAction: false,
+      },
+      {
+        id: "sum-2",
+        content: "Как бы ты сформулировал главный результат нашей работы сегодня?",
+        isAction: false,
+      },
+      {
+        id: "sum-3",
+        content: "Что изменилось в твоем восприятии ситуации?",
+        isAction: false,
+      },
+    ],
+  },
+  {
+    id: "homework",
+    title: "ДОМАШНИЕ ЗАДАНИЯ",
+    icon: "🏠",
+    items: [
+      {
+        id: "hw-1",
+        content: "Какие практики внедрения ты готов выполнять между сессиями?",
+        isAction: false,
+      },
+      {
+        id: "hw-2",
+        content: "Какие конкретные шаги ты планируешь делать до нашей следующей встречи?",
+        isAction: false,
+      },
+      {
+        id: "hw-3",
+        content: "По каким критериям пойму, что практика работает?",
+        isAction: false,
+      },
+    ],
+  },
+  {
+    id: "ecology",
+    title: "ЭКОЛОГИЧЕСКАЯ ПРОВЕРКА",
+    icon: "🌿",
+    items: [
+      {
+        id: "eco-1",
+        content: "Что может помешать внедрению этих изменений в жизнь?",
+        isAction: false,
+      },
+      {
+        id: "eco-2",
+        content: "Какой поддержки тебе может не хватать?",
+        isAction: false,
+      },
+      {
+        id: "eco-3",
+        content: "Есть ли внутреннее сопротивление новому действию?",
+        isAction: false,
+      },
+    ],
+  },
+  {
+    id: "next-session",
+    title: "ДОГОВОРЕННОСТИ О СЛЕДУЮЩЕЙ СЕССИИ",
+    icon: "📅",
+    items: [
+      {
+        id: "next-1",
+        content: "Согласовать дату и время следующей встречи",
+        isAction: true,
+      },
+      {
+        id: "next-2",
+        content: "Определить формат работы (очно/онлайн)",
+        isAction: true,
+      },
+      {
+        id: "next-3",
+        content: "Обсудить предварительную тему следующей сессии",
+        isAction: true,
+      },
+    ],
+  },
+  {
+    id: "closure",
+    title: "БЛАГОДАРНОСТЬ И ЗАКРЫТИЕ",
+    icon: "💝",
+    items: [
+      {
+        id: "cls-1",
+        content: "Признать усилия клиента и прогресс в работе",
+        isAction: true,
+      },
+      {
+        id: "cls-2",
+        content: "Экологичное завершение контакта",
+        isAction: true,
+      },
+      {
+        id: "cls-3",
+        content: "Ритуал завершения сессии (можно использовать дыхательное упражнение или короткую медитацию)",
+        isAction: true,
+      },
+    ],
+  },
+];
+
 export default function SessionComplete() {
   const [completedSteps, setCompletedSteps] = useState<string[]>(() => loadCompletedSteps());
-
-  const { data: steps = [], isLoading } = useQuery<SessionCompletionStep[]>({
-    queryKey: ["/api/session-completion"],
-  });
 
   useEffect(() => {
     saveCompletedSteps(completedSteps);
@@ -49,30 +168,12 @@ export default function SessionComplete() {
     setCompletedSteps([]);
   };
 
-  const allCompleted = steps.length > 0 && completedSteps.length === steps.length;
-  const progress = steps.length > 0 ? Math.round((completedSteps.length / steps.length) * 100) : 0;
-
-  if (isLoading) {
-    return (
-      <div className="p-6 max-w-3xl mx-auto">
-        <Skeleton className="h-8 w-64 mb-4" />
-        <Skeleton className="h-4 w-96 mb-8" />
-        <div className="space-y-4">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-48" />
-                <Skeleton className="h-4 w-full mt-2" />
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const allItems = SESSION_SECTIONS.flatMap(s => s.items);
+  const allCompleted = allItems.length > 0 && completedSteps.length === allItems.length;
+  const progress = allItems.length > 0 ? Math.round((completedSteps.length / allItems.length) * 100) : 0;
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto">
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6" data-testid="breadcrumb">
         <Link href="/" className="hover:text-foreground transition-colors" data-testid="link-breadcrumb-home">
           Главная
@@ -82,16 +183,15 @@ export default function SessionComplete() {
       </nav>
 
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground mb-2" data-testid="text-page-title">
-          Протокол завершения сессии
+        <h1 className="text-3xl font-bold text-foreground mb-2" data-testid="text-page-title">
+          Завершение сессии
         </h1>
         <p className="text-muted-foreground">
-          Пройдите все шаги для корректного завершения терапевтической сессии.
-          Отмечайте выполненные пункты для отслеживания прогресса.
+          Полный протокол завершения терапевтической сессии
         </p>
       </div>
 
-      <Card className="mb-6">
+      <Card className="mb-8">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-4">
@@ -110,7 +210,7 @@ export default function SessionComplete() {
                   {allCompleted ? "Сессия завершена" : "Прогресс завершения"}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {completedSteps.length} из {steps.length} шагов выполнено
+                  {completedSteps.length} из {allItems.length} пунктов выполнено
                 </p>
               </div>
             </div>
@@ -123,54 +223,68 @@ export default function SessionComplete() {
         </CardContent>
       </Card>
 
-      <div className="space-y-4">
-        {steps.map((step, index) => {
-          const isCompleted = completedSteps.includes(step.id);
-          
-          return (
-            <Card 
-              key={step.id}
-              className={`cursor-pointer transition-all hover-elevate ${isCompleted ? "border-success/50" : ""}`}
-              onClick={() => toggleStep(step.id)}
-              data-testid={`card-step-${step.id}`}
-            >
-              <CardHeader className="flex flex-row items-start gap-4">
-                <div className={`
-                  flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors
-                  ${isCompleted 
-                    ? "bg-success border-success text-success-foreground" 
-                    : "border-muted-foreground/30 text-muted-foreground"
-                  }
-                `}>
-                  {isCompleted ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <span className="text-sm font-medium">{index + 1}</span>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <CardTitle className={`text-base ${isCompleted ? "line-through text-muted-foreground" : ""}`}>
-                    {step.title}
-                  </CardTitle>
-                  <CardDescription className="mt-1">
-                    {step.description}
-                  </CardDescription>
-                </div>
-              </CardHeader>
-            </Card>
-          );
-        })}
+      <div className="space-y-6">
+        {SESSION_SECTIONS.map((section) => (
+          <div key={section.id}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-2xl">{section.icon}</div>
+              <h2 className="text-lg font-bold text-foreground">
+                {section.title}
+              </h2>
+            </div>
+
+            <div className="space-y-3 pl-11">
+              {section.items.map((item) => {
+                const isCompleted = completedSteps.includes(item.id);
+                
+                return (
+                  <div
+                    key={item.id}
+                    className={`flex items-start gap-3 p-3 rounded-md cursor-pointer transition-all hover-elevate ${
+                      isCompleted ? "bg-muted/50" : "bg-muted/20"
+                    }`}
+                    onClick={() => toggleStep(item.id)}
+                    data-testid={`item-${item.id}`}
+                  >
+                    <div className={`
+                      flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full transition-colors mt-0.5
+                      ${isCompleted 
+                        ? item.isAction 
+                          ? "text-success" 
+                          : "text-primary"
+                        : item.isAction
+                          ? "text-muted-foreground/40"
+                          : "text-primary/40"
+                      }
+                    `}>
+                      {item.isAction ? (
+                        <CheckCircle2 className="h-5 w-5" />
+                      ) : (
+                        <CircleHelp className="h-5 w-5" />
+                      )}
+                    </div>
+                    <p className={`text-sm flex-1 leading-relaxed ${
+                      isCompleted ? "text-muted-foreground line-through" : "text-foreground"
+                    }`}>
+                      {item.content}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {allCompleted && (
-        <Card className="mt-6 border-success/50 bg-success/5">
+        <Card className="mt-8 border-success/50 bg-success/5">
           <CardContent className="pt-6 text-center">
             <div className="flex items-center justify-center gap-2 text-success mb-2">
               <Check className="h-6 w-6" />
               <span className="font-semibold text-lg">Сессия успешно завершена</span>
             </div>
             <p className="text-muted-foreground text-sm">
-              Все шаги протокола выполнены. Вы можете начать новую сессию.
+              Все пункты протокола выполнены. Вы можете начать новую сессию.
             </p>
           </CardContent>
         </Card>
