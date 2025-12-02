@@ -9,12 +9,32 @@ export interface ChecklistItem {
 }
 
 export interface SessionChecklistProps {
-  stage: "intake" | "analysis" | "selection" | "execution" | "completion";
+  stage: "greeting" | "intake" | "formulation" | "analysis" | "selection" | "execution" | "completion";
   checkedItems: string[];
   onToggle: (itemId: string) => void;
 }
 
 const STAGE_CHECKLISTS: Record<string, ChecklistItem[]> = {
+  greeting: [
+    {
+      id: "welcome",
+      label: "Клиент приветствован тепло и профессионально",
+      description: "Установлена безопасная атмосфера",
+      required: true,
+    },
+    {
+      id: "consent",
+      label: "Получено согласие на работу",
+      description: "Клиент согласен с конфиденциальностью и форматом",
+      required: true,
+    },
+    {
+      id: "structure-explained",
+      label: "Объяснена структура сеанса",
+      description: "Клиент понимает этапы работы",
+      required: true,
+    },
+  ],
   intake: [
     {
       id: "intro",
@@ -38,6 +58,44 @@ const STAGE_CHECKLISTS: Record<string, ChecklistItem[]> = {
       id: "motivation",
       label: "Определена мотивация (актуальность > 8/10)",
       description: "Клиент готов работать над этой проблемой",
+      required: true,
+    },
+  ],
+  formulation: [
+    {
+      id: "request-positive",
+      label: "Запрос сформулирован позитивно",
+      description: "Клиент говорит о том, ЧТО ОН ХОЧЕТ получить",
+      required: true,
+    },
+    {
+      id: "request-motivation",
+      label: "Мотивация высока (8+ баллов)",
+      description: "Клиент серьёзно настроен на изменения",
+      required: true,
+    },
+    {
+      id: "request-dependency",
+      label: "Запрос зависит от клиента",
+      description: "Результат зависит от самого клиента, не от других",
+      required: true,
+    },
+    {
+      id: "request-realistic",
+      label: "Запрос реалистичен",
+      description: "Результат можно достичь за разумное время",
+      required: true,
+    },
+    {
+      id: "request-concrete",
+      label: "Запрос конкретен",
+      description: "Определены явные признаки достижения",
+      required: true,
+    },
+    {
+      id: "alliance-formed",
+      label: "Образован терапевтический альянс",
+      description: "Клиент готов к работе",
       required: true,
     },
   ],
