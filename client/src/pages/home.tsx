@@ -9,7 +9,6 @@ import { SearchBar } from "@/components/search-bar";
 import { FilterBar } from "@/components/filter-bar";
 import { FavoritesButton, getFavorites } from "@/components/favorites-button";
 import { NotesModal } from "@/components/notes-modal";
-import { ExportButton } from "@/components/export-button";
 import type { Category, TherapyScript, DifficultyLevel } from "@shared/schema";
 
 export default function Home() {
@@ -119,7 +118,6 @@ export default function Home() {
         >
           Избранное ({getFavorites().length})
         </Badge>
-        <ExportButton scripts={scripts} />
       </div>
 
       <h2 className="text-lg font-semibold text-foreground mb-4" data-testid="text-categories-heading">
