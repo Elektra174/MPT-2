@@ -7,12 +7,14 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SessionTimer } from "@/components/session-timer";
 import { SessionHistory } from "@/components/session-history";
+import { ThemeToggle } from "@/components/theme-toggle";
 import Home from "@/pages/home";
 import ScriptPage from "@/pages/script-page";
 import Practices from "@/pages/practices";
 import SessionComplete from "@/pages/session-complete";
 import SessionFlow from "@/pages/session-flow";
 import NotFound from "@/pages/not-found";
+import { useEffect } from "react";
 
 function Router() {
   return (
@@ -33,6 +35,17 @@ function App() {
     "--sidebar-width-icon": "3rem",
   };
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem("mpt-theme");
+    
+    if (savedTheme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -47,6 +60,7 @@ function App() {
                 <div className="flex items-center gap-2">
                   <SessionTimer />
                   <SessionHistory />
+                  <ThemeToggle />
                 </div>
               </header>
               <main className="flex-1 overflow-auto bg-background">
