@@ -115,6 +115,19 @@ function getBlockClass(type: string): string {
   }
 }
 
+function getBlockTextClass(type: string): string {
+  switch (type) {
+    case "question":
+      return "text-foreground font-medium";
+    case "note":
+    case "instruction":
+    case "theory":
+      return "text-muted-foreground";
+    default:
+      return "text-foreground";
+  }
+}
+
 function ContentBlock({ block }: { block: ScriptBlock }) {
   if (block.type === "list") {
     return (
@@ -135,7 +148,7 @@ function ContentBlock({ block }: { block: ScriptBlock }) {
     <div className={getBlockClass(block.type)} data-testid={`block-${block.id}`}>
       <div className="flex items-start gap-3">
         <BlockIcon type={block.type} />
-        <p className="flex-1 text-foreground leading-relaxed">{block.content}</p>
+        <p className={`flex-1 leading-relaxed ${getBlockTextClass(block.type)}`}>{block.content}</p>
       </div>
     </div>
   );
@@ -349,8 +362,28 @@ export default function ScriptPage() {
           </div>
 
           <div className="script-content">
+            <div className="flex justify-end mb-4 no-print">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAllExpanded(prev => prev === true ? false : true)}
+                data-testid="button-toggle-all"
+              >
+                {allExpanded ? (
+                  <>
+                    <ChevronUp className="h-4 w-4 mr-2" />
+                    Свернуть всё
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4 mr-2" />
+                    Развернуть всё
+                  </>
+                )}
+              </Button>
+            </div>
             {groupBlocksIntoSections(script.blocks).map((section: Section) => (
-              <CollapsibleSection key={section.heading.id} section={section} />
+              <CollapsibleSection key={section.heading.id} section={section} forceOpen={allExpanded} />
             ))}
           </div>
         </div>
