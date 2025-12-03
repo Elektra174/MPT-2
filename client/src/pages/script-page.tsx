@@ -12,12 +12,17 @@ import {
   AlertCircle,
   Lightbulb,
   Activity,
-  ListOrdered
+  ListOrdered,
+  Plus,
+  Minus,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { ScriptTips } from "@/components/script-tips";
@@ -87,45 +92,37 @@ function BlockIcon({ type }: { type: string }) {
   }
 }
 
-function ScriptBlock({ block }: { block: ScriptBlock }) {
-  const getBlockClass = () => {
-    switch (block.type) {
-      case "heading":
-        return "";
-      case "question":
-        return "block-question";
-      case "instruction":
-        return "block-instruction";
-      case "note":
-        return "block-note";
-      case "theory":
-        return "block-theory";
-      case "practice":
-        return "block-practice";
-      case "step":
-        return "block-step";
-      case "list":
-        return "my-4";
-      default:
-        return "my-3";
-    }
-  };
-
-  if (block.type === "heading") {
-    return (
-      <h2 className="text-lg font-semibold mt-8 mb-4 text-foreground border-b border-border pb-2" data-testid={`heading-${block.id}`}>
-        {block.content}
-      </h2>
-    );
+function getBlockClass(type: string): string {
+  switch (type) {
+    case "heading":
+      return "";
+    case "question":
+      return "block-question";
+    case "instruction":
+      return "block-instruction";
+    case "note":
+      return "block-note";
+    case "theory":
+      return "block-theory";
+    case "practice":
+      return "block-practice";
+    case "step":
+      return "block-step";
+    case "list":
+      return "my-4";
+    default:
+      return "my-3";
   }
+}
 
+function ContentBlock({ block }: { block: ScriptBlock }) {
   if (block.type === "list") {
     return (
-      <div className={getBlockClass()} data-testid={`block-${block.id}`}>
+      <div className={getBlockClass(block.type)} data-testid={`block-${block.id}`}>
         <p className="font-medium text-foreground mb-2">{block.content}</p>
         {block.subContent && block.subContent.length > 0 && (
           <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2">
-            {block.subContent.map((item, idx) => (
+            {block.subContent.map((item: string, idx: number) => (
               <li key={idx} className="text-sm">{item}</li>
             ))}
           </ul>
@@ -135,7 +132,7 @@ function ScriptBlock({ block }: { block: ScriptBlock }) {
   }
 
   return (
-    <div className={getBlockClass()} data-testid={`block-${block.id}`}>
+    <div className={getBlockClass(block.type)} data-testid={`block-${block.id}`}>
       <div className="flex items-start gap-3">
         <BlockIcon type={block.type} />
         <p className="flex-1 text-foreground leading-relaxed">{block.content}</p>
@@ -144,10 +141,79 @@ function ScriptBlock({ block }: { block: ScriptBlock }) {
   );
 }
 
+interface Section {
+  heading: ScriptBlock;
+  blocks: ScriptBlock[];
+}
+
+function groupBlocksIntoSections(blocks: ScriptBlock[]): Section[] {
+  const sections: Section[] = [];
+  let currentSection: Section | null = null;
+
+  for (const block of blocks) {
+    if (block.type === "heading") {
+      if (currentSection) {
+        sections.push(currentSection);
+      }
+      currentSection = { heading: block, blocks: [] };
+    } else if (currentSection) {
+      currentSection.blocks.push(block);
+    }
+  }
+
+  if (currentSection) {
+    sections.push(currentSection);
+  }
+
+  return sections;
+}
+
+function CollapsibleSection({ section, forceOpen }: { section: Section; forceOpen?: boolean }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  useEffect(() => {
+    if (forceOpen !== undefined) {
+      setIsOpen(forceOpen);
+    }
+  }, [forceOpen]);
+  
+  const questionCount = section.blocks.filter((b: ScriptBlock) => b.type === "question").length;
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="mb-4">
+      <CollapsibleTrigger className="flex items-center gap-3 w-full text-left py-2 hover:bg-muted/50 rounded-md transition-colors cursor-pointer group" data-testid={`toggle-section-${section.heading.id}`}>
+        <div className="flex items-center justify-center w-6 h-6 rounded border border-border bg-background group-hover:bg-muted transition-colors">
+          {isOpen ? (
+            <Minus className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <Plus className="h-4 w-4 text-muted-foreground" />
+          )}
+        </div>
+        <h2 className="text-lg font-semibold text-foreground flex-1" data-testid={`heading-${section.heading.id}`}>
+          {section.heading.content}
+        </h2>
+        {questionCount > 0 && (
+          <Badge variant="secondary" className="text-xs">
+            {questionCount} {questionCount === 1 ? "вопрос" : questionCount < 5 ? "вопроса" : "вопросов"}
+          </Badge>
+        )}
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="mt-3 pl-9 border-l-2 border-border ml-3">
+          {section.blocks.map((block: ScriptBlock) => (
+            <ContentBlock key={block.id} block={block} />
+          ))}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
 export default function ScriptPage() {
   const [, params] = useRoute("/script/:id");
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [allExpanded, setAllExpanded] = useState<boolean | undefined>(undefined);
 
   const scriptId = params?.id;
 
@@ -283,8 +349,8 @@ export default function ScriptPage() {
           </div>
 
           <div className="script-content">
-            {script.blocks.map((block) => (
-              <ScriptBlock key={block.id} block={block} />
+            {groupBlocksIntoSections(script.blocks).map((section: Section) => (
+              <CollapsibleSection key={section.heading.id} section={section} />
             ))}
           </div>
         </div>
