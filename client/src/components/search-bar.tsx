@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ interface SearchBarProps {
 export function SearchBar({ scripts, onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
 
-  useMemo(() => {
+  useEffect(() => {
     if (!query.trim()) {
       onSearch(scripts);
       return;
