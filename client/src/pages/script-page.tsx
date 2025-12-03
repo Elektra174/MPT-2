@@ -132,9 +132,9 @@ function ContentBlock({ block }: { block: ScriptBlock }) {
   if (block.type === "list") {
     return (
       <div className={getBlockClass(block.type)} data-testid={`block-${block.id}`}>
-        <p className="font-medium text-foreground mb-2">{block.content}</p>
+        <p className="font-medium text-muted-foreground mb-2">{block.content}</p>
         {block.subContent && block.subContent.length > 0 && (
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2">
+          <ul className="list-disc list-inside space-y-1 text-muted-foreground/80 ml-2">
             {block.subContent.map((item: string, idx: number) => (
               <li key={idx} className="text-sm">{item}</li>
             ))}

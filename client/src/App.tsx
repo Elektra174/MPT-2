@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SessionTimer } from "@/components/session-timer";
 import { SessionHistory } from "@/components/session-history";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import Home from "@/pages/home";
 import ScriptPage from "@/pages/script-page";
 import Practices from "@/pages/practices";
@@ -70,6 +71,7 @@ function App() {
           </div>
         </SidebarProvider>
         <Toaster />
+        <ScrollToTop />
       </TooltipProvider>
     </QueryClientProvider>
   );
