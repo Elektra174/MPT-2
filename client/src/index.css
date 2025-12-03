@@ -285,9 +285,39 @@
       display: block !important;
     }
 
+    html,
     body {
-      background: white;
+      background: white !important;
       font-size: 12pt;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      height: auto !important;
+    }
+
+    * {
+      overflow: visible !important;
+      height: auto !important;
+    }
+
+    div[class*="max-w-"] {
+      max-width: 100% !important;
+    }
+
+    .p-6 {
+      padding: 0.5in !important;
+    }
+
+    .script-content {
+      overflow: visible !important;
+      height: auto !important;
+      width: 100% !important;
+    }
+
+    .script-content h2 {
+      page-break-after: avoid;
+      orphans: 3;
+      widows: 3;
     }
 
     .block-question,
@@ -298,6 +328,14 @@
     .block-step {
       break-inside: avoid;
       page-break-inside: avoid;
+      orphans: 2;
+      widows: 2;
+    }
+
+    /* Ensure content flows naturally across pages */
+    p {
+      orphans: 2;
+      widows: 2;
     }
   }
 }
