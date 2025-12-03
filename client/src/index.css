@@ -293,11 +293,13 @@
       padding: 0 !important;
       overflow: visible !important;
       height: auto !important;
+      color: #000 !important;
     }
 
     * {
       overflow: visible !important;
       height: auto !important;
+      color: #000 !important;
     }
 
     div[class*="max-w-"] {
@@ -312,12 +314,19 @@
       overflow: visible !important;
       height: auto !important;
       width: 100% !important;
+      color: #000 !important;
     }
 
     .script-content h2 {
       page-break-after: avoid;
       orphans: 3;
       widows: 3;
+      color: #000 !important;
+      font-weight: bold;
+    }
+
+    .script-content p {
+      color: #000 !important;
     }
 
     .block-question,
@@ -330,12 +339,38 @@
       page-break-inside: avoid;
       orphans: 2;
       widows: 2;
+      background: white !important;
+      color: #000 !important;
+      border-color: #333 !important;
+    }
+
+    .block-question p,
+    .block-instruction p,
+    .block-note p,
+    .block-theory p,
+    .block-practice p,
+    .block-step p {
+      color: #000 !important;
     }
 
     /* Ensure content flows naturally across pages */
     p {
       orphans: 2;
       widows: 2;
+      color: #000 !important;
+    }
+
+    /* Darker text for all text elements */
+    h1, h2, h3, h4, h5, h6 {
+      color: #000 !important;
+    }
+
+    ul, ol, li {
+      color: #000 !important;
+    }
+
+    span {
+      color: #000 !important;
     }
   }
 }
