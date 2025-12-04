@@ -192,6 +192,16 @@ function CollapsibleSection({ section, forceOpen }: { section: Section; forceOpe
   
   const questionCount = section.blocks.filter((b: ScriptBlock) => b.type === "question").length;
 
+  if (section.blocks.length === 0) {
+    return (
+      <div className="mb-4 py-3 border-b border-border" data-testid={`section-title-${section.heading.id}`}>
+        <h2 className="text-xl font-bold text-primary" data-testid={`heading-${section.heading.id}`}>
+          {section.heading.content}
+        </h2>
+      </div>
+    );
+  }
+
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="mb-4">
       <CollapsibleTrigger className="flex items-center gap-3 w-full text-left py-2 hover:bg-muted/50 rounded-md transition-colors cursor-pointer group" data-testid={`toggle-section-${section.heading.id}`}>
