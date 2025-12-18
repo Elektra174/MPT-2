@@ -1,11 +1,7 @@
 {
-  "name": "mpt-2",
+  "name": "mpt-script",
   "compatibility_date": "2025-12-18",
-
-  // Твой сервер (Express-совместимый код)
-  "main": "dist/index.cjs",
-
-  // Твой Vite-фронт
+  "main": "dist/worker.js",
   "assets": {
     "directory": "./dist/public"
   }
