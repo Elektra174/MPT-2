@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "your-app-name", // замените на имя вашего проекта
+  "compatibility_date": "2025-12-18",
+  "main": "dist/index.cjs",
+  "compatibility_flags": ["nodejs_compat"]
+}
