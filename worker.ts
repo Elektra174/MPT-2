@@ -1,11 +1,12 @@
 export default {
-  async fetch(request: Request, env: any, ctx: ExecutionContext) {
+  async fetch(request: Request, env: any) {
     const url = new URL(request.url);
 
-    if (url.pathname === "/api/health") {
-      return new Response(JSON.stringify({ ok: true }), {
-        headers: { "content-type": "application/json" }
-      });
+    if (url.pathname.startsWith("/api")) {
+      return new Response(
+        JSON.stringify({ ok: true }),
+        { headers: { "content-type": "application/json" } }
+      );
     }
 
     return env.ASSETS.fetch(request);
