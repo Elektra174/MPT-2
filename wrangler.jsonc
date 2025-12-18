@@ -1,7 +1,6 @@
 {
-  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
-  "name": "your-app-name", // замените на имя вашего проекта
+  "name": "mpt-script", // Используйте точное имя из CI-логов
   "compatibility_date": "2025-12-18",
-  "main": "dist/index.cjs",
+  "main": "./src/index.ts", // Указываем исходный файл-модуль
   "compatibility_flags": ["nodejs_compat"]
 }
