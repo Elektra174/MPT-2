@@ -76,6 +76,7 @@ app.use((req, res, next) => {
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
   } else {
+    // Use dynamic import only in development
     const { setupVite } = await import("./vite");
     await setupVite(httpServer, app);
   }
