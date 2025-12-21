@@ -14,7 +14,7 @@ async function buildAll() {
   console.log("building worker...");
 
   await esbuild({
-    entryPoints: ["src/worker.ts"],
+    entryPoints: ["worker.ts"], // ← FIXED HERE
     bundle: true,
     format: "esm",
     outfile: "dist/worker.js",
