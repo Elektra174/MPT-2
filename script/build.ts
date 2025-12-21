@@ -6,28 +6,35 @@ async function buildAll() {
   // чистим dist
   await rm("dist", { recursive: true, force: true });
 
+  // ---------- SERVER ----------
+  console.log("building server...");
+  await esbuild({
+    entryPoints: ["server/index.ts"],
+    bundle: true,
+    format: "cjs",  // CommonJS для Node.js
+    platform: "node",
+    target: "node22",
+    outfile: "dist/index.cjs",
+    external: ["express", "@neondatabase/serverless"], // внешние зависимости
+    minify: true,
+  });
+
   // ---------- CLIENT ----------
   console.log("building client...");
   await viteBuild();
 
   // ---------- WORKER ----------
   console.log("building worker...");
-
   await esbuild({
-    entryPoints: ["worker.ts"], // ← FIXED HERE
+    entryPoints: ["worker.ts"],
     bundle: true,
     format: "esm",
     outfile: "dist/worker.js",
-
-    // КРИТИЧНО для Cloudflare Workers
     platform: "neutral",
     target: "es2022",
-
-    // Workers-совместимые defines
     define: {
       "process.env.NODE_ENV": '"production"',
     },
-
     minify: true,
     sourcemap: false,
     logLevel: "info",
