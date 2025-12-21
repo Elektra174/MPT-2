@@ -16,27 +16,50 @@ async function buildAll() {
     target: "node22",
     outfile: "dist/index.cjs",
     
-    // КРИТИЧНО: исключаем нодовские и внешние модули
+    // КРИТИЧНО: исключаем ВСЕ ненужные модули
     external: [
-      // Node.js built-ins
+      // Все зависимости кроме тех, что нужны серверу
+      "vite",
+      "@vitejs/plugin-react",
+      "@replit/vite-plugin-cartographer",
+      "@replit/vite-plugin-dev-banner",
+      "@replit/vite-plugin-runtime-error-modal",
+      "@tailwindcss/typography",
+      "@tailwindcss/vite",
+      "autoprefixer",
+      "postcss",
+      "tailwindcss",
+      "tailwindcss-animate",
+      "tw-animate-css",
+      "esbuild",
+      
+      // React и клиентские зависимости
+      "react",
+      "react-dom",
+      "@hookform/resolvers",
+      "@radix-ui/*",
+      "@tanstack/react-query",
+      "class-variance-authority",
+      "cmdk",
+      "embla-carousel-react",
+      "framer-motion",
+      "input-otp",
+      "lucide-react",
+      "next-themes",
+      "react-day-picker",
+      "react-hook-form",
+      "react-icons",
+      "react-resizable-panels",
+      "recharts",
+      "tailwind-merge",
+      "vaul",
+      "wouter",
+      
+      // Node.js built-ins (автоматически внешние, но лучше явно)
       "fs", "path", "http", "https", "url", "stream", "crypto", "util",
       "zlib", "events", "buffer", "os", "net", "tls", "child_process",
       "cluster", "dgram", "dns", "module", "querystring", "readline",
       "repl", "string_decoder", "timers", "tty", "vm", "worker_threads",
-      
-      // Внешние зависимости
-      "express", 
-      "@neondatabase/serverless",
-      "connect-pg-simple",
-      "express-session",
-      "memorystore",
-      "passport",
-      "passport-local",
-      "ws",
-      "drizzle-orm",
-      "drizzle-zod",
-      "zod",
-      "zod-validation-error"
     ],
     
     minify: true,
